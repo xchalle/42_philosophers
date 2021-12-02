@@ -6,7 +6,7 @@
 /*   By: xchalle <xchalle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/19 15:46:26 by xchalle           #+#    #+#             */
-/*   Updated: 2021/11/19 16:38:00 by xchalle          ###   ########.fr       */
+/*   Updated: 2021/12/02 14:42:00 by xchalle          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ t_p		*initiate_user(t_p *phil, char **argv, int *close_n)
 	i = 0;
 	while (i < ft_atoi(argv[1], 0, 0, 1))
 	{
-		phil->user[i].gbl = phil->gbl;
+		phil->user[i].gbl = &phil->gbl;
 		phil->user[i].fork = phil->fork;
 		phil->user[i].alive = 1;
 		phil->user[i].left_f = i;
@@ -33,6 +33,7 @@ t_p		*initiate_user(t_p *phil, char **argv, int *close_n)
 		phil->user[i].sleeping = 0;
 		phil->user[i].think_time = 0;
 		phil->user[i].thinking = 0;
+		phil->user[i].only_once = 1;
 		pthread_mutex_init(&phil->fork[i], NULL);
 		i++;
 	}
@@ -41,6 +42,7 @@ t_p		*initiate_user(t_p *phil, char **argv, int *close_n)
 
 t_p		*initiate_global(t_p *phil, char **argv, int argc, int *close_n)
 {
+	phil->gbl.nbr_died = 0;
 	phil->gbl.nuph = ft_atoi(argv[1], 0, 0, 1);
 	phil->gbl.tidie = ft_atoi(argv[2], 0, 0, 1);
 	phil->gbl.tieat = ft_atoi(argv[3], 0, 0, 1);
@@ -115,6 +117,5 @@ int	main(int argc, char **argv)
 	free(phil->fork);
 	free(phil->user);
 	free (phil);
-	printf("main end \n");
 	return (0);
 }

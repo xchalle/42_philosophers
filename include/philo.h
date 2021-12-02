@@ -28,22 +28,27 @@ typedef struct s_global
     int tieat;
     int tisle;
     int nueat;
+    int nbr_died;
+    int nbr_eat;
+    int done_eat;
 }               t_global;
 
 typedef struct s_user
 {
     pthread_t   thread;
     pthread_t   thread_2;
+    pthread_mutex_t   diemut;
     pthread_mutex_t   eatmut;
     pthread_mutex_t   printer_mutex;
     pthread_mutex_t   *fork;
-    t_global    gbl;
+    t_global    *gbl;
     int left_f;
     int right_f;
     int sleeping;
     int eating;
     int thinking;
     long long crea_time;
+    long long last_sleep;
     long long last_eat;
     int *close;
     int sleep_time;
@@ -51,6 +56,7 @@ typedef struct s_user
     int eat_time;
     int nbr_eat;
     int alive;
+    int only_once;
 }               t_user;
 
 

@@ -5,17 +5,17 @@ void    printer(t_user *user, char *str)
     pthread_mutex_lock(&user->printer_mutex);
     if (*user->close == 0)
     {
-        printf("%d %lld %d %s", *user->close, get_time() - user->crea_time, user->left_f, str);
+        //printf("%d %lld %d %s", *user->close, get_time() - user->crea_time, user->left_f, str);
         pthread_mutex_unlock(&user->printer_mutex);
         return ;
     }
-    printf("%d %lld %d %s", *user->close, get_time() - user->crea_time, user->left_f, str);
+    printf("%lld %d %s", get_time() - user->crea_time, (user->left_f + 1), str);
     if (ft_strlen(str) != 5)
         pthread_mutex_unlock(&user->printer_mutex);
     else
     {
         *user->close = 0;
-        //usleep(100);
+        //usleep(100000);
         pthread_mutex_unlock(&user->printer_mutex);
     }
     return ;
@@ -26,7 +26,10 @@ void    sleeping(t_user *user_t)
     if (*user_t->close == 0)
         return ;
     printer(user_t, "is sleeping\n");
-    usleep(user_t->gbl.tisle);
+    user_t->last_sleep = get_time();
+    usleep(user_t->gbl->tisle * 1000);
+  //  while (get_time() - user_t->last_sleep < (user_t->gbl->tisle))
+    //    continue;
 }
 
 void think(t_user *user_t)
@@ -39,15 +42,17 @@ void think(t_user *user_t)
 void    eat(t_user *user_t)
 {
     pthread_mutex_lock(&user_t->fork[user_t->left_f]);
-    printer(user_t, "has taken a fork\n");
+    printer(user_t, "has taken a fork left\n");
     pthread_mutex_lock(&user_t->fork[user_t->right_f]);
-    printer(user_t, "has taken a fork\n");
+    printer(user_t, "has taken a fork right\n");
     pthread_mutex_lock(&user_t->eatmut);
     user_t->eating = 1;
     printer(user_t, "is eating\n");
     user_t->last_eat = get_time();
     user_t->nbr_eat++;
-    usleep(user_t->gbl.tieat);
+    usleep(user_t->gbl->tieat * 1000);
+    //while (get_time() - user_t->last_eat < (user_t->gbl->tieat))
+    //    continue;
     user_t->eating = 0;
     pthread_mutex_unlock(&user_t->eatmut);
     pthread_mutex_unlock(&user_t->fork[user_t->left_f]);
@@ -61,22 +66,24 @@ void    *routine(void *user)
     user_t = (t_user *)user;
     while (*user_t->close == 1)
     {
-        if (user_t->gbl.nueat > 0 && user_t->nbr_eat >= user_t->gbl.nueat)
+        //if (user_t->gbl->nueat > 0 && user_t->nbr_eat >= user_t->gbl->nueat)
+        //    return (NULL);
+        //if (*user_t->close == 0)
+        //{
+        //    user_t->alive = 0;
+        //    return (NULL);
+        //}
+        if (user_t->gbl->nuph == 1)
             return (NULL);
-        if (*user_t->close == 0)
-        {
-            user_t->alive = 0;
-            return (NULL);
-        }
         eat(user_t);
         sleeping(user_t);
         think(user_t);
         usleep(100);
-        if (*user_t->close == 0)
-        {
-            user_t->alive = 0;
-            return (NULL);
-        }
+        //if (*user_t->close == 0)
+        //{
+        //    user_t->alive = 0;
+        //    return (NULL);
+        //}
     }
     return (NULL);
 }
@@ -84,28 +91,32 @@ void    *routine(void *user)
 void    *kekw(void *user)
  {
     t_user *user_t;
-    int i;
 
     user_t = (t_user *)user;
-    i = 0;
     while (*user_t->close == 1)
     {
-        if (user_t->eating == 0 && get_time() - user_t->last_eat >= user_t->gbl.tidie)
+        if (user_t->eating == 0 && get_time() - user_t->last_eat >= user_t->gbl->tidie)
         {
             pthread_mutex_lock(&user_t->eatmut);
-            printer(user_t, "died\n");
-            //if (*user_t->close == 1)
-            //    printf("%lld philo %d died\n", (get_time() - user_t->crea_time), user_t->left_f);
+            user_t->gbl->nbr_died++;
+            if (user_t->gbl->nbr_died == 1)
+                printer(user_t, "died\n");
             *user_t->close = 0;
             user_t->alive = 0;
             pthread_mutex_unlock(&user_t->eatmut);
         }
-        if (user_t->nbr_eat == user_t->gbl.nueat)
+        if (user_t->nbr_eat == user_t->gbl->nueat && user_t->only_once == 1)
         {
-            user_t->alive = 0;
-            return (NULL);
+            pthread_mutex_lock(&user_t->diemut);
+            user_t->gbl->done_eat++;
+            user_t->only_once = 0;
+            pthread_mutex_unlock(&user_t->diemut);
         }
-        i++;
+        if (user_t->gbl->done_eat == user_t->gbl->nuph)
+        {
+            *user_t->close = 0;
+            user_t->alive = 0;
+        }
         usleep(100);
     }
     //pthread_mutex_unlock(&user_t->printer_mutex);
