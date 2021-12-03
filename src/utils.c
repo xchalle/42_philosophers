@@ -6,7 +6,7 @@
 /*   By: xchalle <xchalle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/19 16:08:08 by xchalle           #+#    #+#             */
-/*   Updated: 2021/11/19 16:36:50 by xchalle          ###   ########.fr       */
+/*   Updated: 2021/12/03 10:27:42 by xchalle          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ int	is_num(char *str)
 	int	i;
 
 	i = 0;
-	
 	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
 		i++;
 	if (str[i] == '+' || str[i] == '-')
@@ -59,7 +58,7 @@ int	is_num(char *str)
 
 int	ft_strlen(char *str)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (str[i])
@@ -83,10 +82,10 @@ int	check_arg(char **argv, int argc)
 	return (0);
 }
 
-long long	get_time()
+long long	get_time(void)
 {
-	struct timeval t;
-	long long	time;
+	struct timeval	t;
+	long long		time;
 
 	time = 0;
 	gettimeofday(&t, NULL);

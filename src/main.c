@@ -6,15 +6,15 @@
 /*   By: xchalle <xchalle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/19 15:46:26 by xchalle           #+#    #+#             */
-/*   Updated: 2021/12/02 14:42:00 by xchalle          ###   ########.fr       */
+/*   Updated: 2021/12/03 10:30:13 by xchalle          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo.h"
 
-t_p		*initiate_user(t_p *phil, char **argv, int *close_n)
+t_p	*initiate_user(t_p *phil, char **argv, int *close_n)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (i < ft_atoi(argv[1], 0, 0, 1))
@@ -40,7 +40,7 @@ t_p		*initiate_user(t_p *phil, char **argv, int *close_n)
 	return (phil);
 }
 
-t_p		*initiate_global(t_p *phil, char **argv, int argc, int *close_n)
+t_p	*initiate_global(t_p *phil, char **argv, int argc, int *close_n)
 {
 	phil->gbl.nbr_died = 0;
 	phil->gbl.nuph = ft_atoi(argv[1], 0, 0, 1);
@@ -52,10 +52,12 @@ t_p		*initiate_global(t_p *phil, char **argv, int argc, int *close_n)
 	else
 		phil->gbl.nueat = -1;
 	phil->creat_time = get_time();
-	phil->fork = malloc(sizeof(pthread_mutex_t) * (ft_atoi(argv[1], 0, 0, 1) + 1));
+	phil->fork = malloc(sizeof(pthread_mutex_t)
+			* (ft_atoi(argv[1], 0, 0, 1) + 1));
 	if (phil->fork == NULL)
 		return (NULL);
-	phil->user = malloc(sizeof(t_user) * (ft_atoi(argv[1], 0, 0, 1) + 1));
+	phil->user = malloc(sizeof(t_user)
+			* (ft_atoi(argv[1], 0, 0, 1) + 1));
 	if (phil->user == NULL)
 		return (NULL);
 	phil = initiate_user(phil, argv, close_n);
@@ -70,14 +72,16 @@ void	start_philo(t_p *phil)
 	while (i < phil->gbl.nuph)
 	{
 		phil->user[i].last_eat = get_time();
-		pthread_create(&phil->user[i].thread, NULL, &routine, (void *)&phil->user[i]);
+		pthread_create(&phil->user[i].thread, NULL,
+			&routine, (void *)&phil->user[i]);
 		usleep(100);
 		i++;
 	}
 	i = 0;
 	while (i < phil->gbl.nuph)
 	{
-		pthread_create(&phil->user[i].thread_2, NULL, &kekw, (void *)&phil->user[i]);
+		pthread_create(&phil->user[i].thread_2, NULL,
+			&kekw, (void *)&phil->user[i]);
 		usleep(100);
 		i++;
 	}
@@ -109,10 +113,10 @@ int	main(int argc, char **argv)
 	}
 	phil = malloc(sizeof(t_p));
 	if (phil == NULL)
-		return (0); //EXIT_MESSAGE
+		return (0);
 	phil = initiate_global(phil, argv, argc, &close_n);
 	if (phil == NULL)
-		return (0); //EXIT_FREE
+		return (0);
 	start_philo(phil);
 	free(phil->fork);
 	free(phil->user);
