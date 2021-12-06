@@ -6,7 +6,7 @@
 /*   By: xchalle <xchalle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/19 15:46:26 by xchalle           #+#    #+#             */
-/*   Updated: 2021/12/03 10:30:13 by xchalle          ###   ########.fr       */
+/*   Updated: 2021/12/06 10:45:59 by xchalle          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ t_p	*initiate_global(t_p *phil, char **argv, int argc, int *close_n)
 	return (phil);
 }
 
-void	start_philo(t_p *phil)
+void	loop_thread(t_p *phil)
 {
 	int	i;
 
@@ -85,7 +85,14 @@ void	start_philo(t_p *phil)
 		usleep(100);
 		i++;
 	}
+}
+
+void	start_philo(t_p *phil)
+{
+	int	i;
+
 	i = 0;
+	loop_thread(phil);
 	while (i < phil->gbl.nuph)
 	{
 		pthread_join(phil->user[i].thread_2, NULL);

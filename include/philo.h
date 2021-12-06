@@ -6,7 +6,7 @@
 /*   By: xchalle <xchalle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/19 16:32:48 by xchalle           #+#    #+#             */
-/*   Updated: 2021/12/03 10:48:40 by xchalle          ###   ########.fr       */
+/*   Updated: 2021/12/06 11:01:11 by xchalle          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,5 +73,6 @@ long long	get_time(void);
 long long	ft_atoi(const char *str, int i, long long d, int c);
 void		*routine(void *user);
 void		*kekw(void *user);
+void		printer(t_user *user, char *str);
 
 #endif
