@@ -42,11 +42,7 @@ t_p	*initiate_user(t_p *phil, char **argv, int *close_n)
 
 t_p	*initiate_global(t_p *phil, char **argv, int argc, int *close_n)
 {
-	phil->gbl.nbr_died = 0;
-	phil->gbl.nuph = ft_atoi(argv[1], 0, 0, 1);
-	phil->gbl.tidie = ft_atoi(argv[2], 0, 0, 1);
-	phil->gbl.tieat = ft_atoi(argv[3], 0, 0, 1);
-	phil->gbl.tisle = ft_atoi(argv[4], 0, 0, 1);
+	init_var(phil, argv);
 	if (argc == 6)
 		phil->gbl.nueat = ft_atoi(argv[5], 0, 0, 1);
 	else
@@ -55,11 +51,19 @@ t_p	*initiate_global(t_p *phil, char **argv, int argc, int *close_n)
 	phil->fork = malloc(sizeof(pthread_mutex_t)
 			* (ft_atoi(argv[1], 0, 0, 1) + 1));
 	if (phil->fork == NULL)
+	{
+		free(phil);
 		return (NULL);
+	}
 	phil->user = malloc(sizeof(t_user)
 			* (ft_atoi(argv[1], 0, 0, 1) + 1));
 	if (phil->user == NULL)
+	{
+		free(phil->fork);
+		free(phil);
 		return (NULL);
+	}
+	mut_ini(phil);
 	phil = initiate_user(phil, argv, close_n);
 	return (phil);
 }
@@ -125,8 +129,6 @@ int	main(int argc, char **argv)
 	if (phil == NULL)
 		return (0);
 	start_philo(phil);
-	free(phil->fork);
-	free(phil->user);
-	free (phil);
+	mut_dest(phil);
 	return (0);
 }

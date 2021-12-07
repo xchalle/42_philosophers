@@ -6,7 +6,7 @@
 /*   By: xchalle <xchalle@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/19 16:32:48 by xchalle           #+#    #+#             */
-/*   Updated: 2021/12/06 11:01:11 by xchalle          ###   ########.fr       */
+/*   Updated: 2021/12/07 16:50:39 by xchalle          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,23 +23,25 @@
 
 typedef struct s_global
 {
-	int	nuph;
-	int	tidie;
-	int	tieat;
-	int	tisle;
-	int	nueat;
-	int	nbr_died;
-	int	nbr_eat;
-	int	done_eat;
+	int				nuph;
+	int				tidie;
+	int				tieat;
+	int				tisle;
+	int				nueat;
+	int				nbr_died;
+	int				nbr_eat;
+	int				done_eat;
+	pthread_mutex_t	diemut;
+	pthread_mutex_t	nbrmut;
+	pthread_mutex_t	clomut;
+	pthread_mutex_t	eatmut;
+	pthread_mutex_t	printer_mutex;
 }		t_global;
 
 typedef struct s_user
 {
 	pthread_t		thread;
-	pthread_t		thread_2;
-	pthread_mutex_t	diemut;
-	pthread_mutex_t	eatmut;
-	pthread_mutex_t	printer_mutex;
+	pthread_t		thread_2;	
 	pthread_mutex_t	*fork;
 	t_global		*gbl;
 	int				left_f;
@@ -73,6 +75,9 @@ long long	get_time(void);
 long long	ft_atoi(const char *str, int i, long long d, int c);
 void		*routine(void *user);
 void		*kekw(void *user);
-void		printer(t_user *user, char *str);
+void		printer(t_user *user, char *str, int i);
+void		mut_dest(t_p *phil);
+void		mut_ini(t_p *phil);
+void		init_var(t_p *phil, char **argv);
 
 #endif

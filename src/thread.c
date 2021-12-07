@@ -12,55 +12,64 @@
 
 #include "../include/philo.h"
 
-void	printer(t_user *user, char *str)
-{
-	pthread_mutex_lock(&user->printer_mutex);
-	if (*user->close == 0)
-	{
-		pthread_mutex_unlock(&user->printer_mutex);
-		return ;
-	}
-	printf("%lld %d %s", get_time() - user->crea_time, (user->left_f + 1), str);
-	if (ft_strlen(str) != 5)
-		pthread_mutex_unlock(&user->printer_mutex);
-	else
-	{
-		*user->close = 0;
-		pthread_mutex_unlock(&user->printer_mutex);
-	}
-	return ;
-}
-
 void	sleeping(t_user *user_t)
 {
+	pthread_mutex_lock(&user_t->gbl->clomut);
 	if (*user_t->close == 0)
+	{
+		pthread_mutex_unlock(&user_t->gbl->clomut);
 		return ;
-	printer(user_t, "is sleeping\n");
+	}
+	pthread_mutex_unlock(&user_t->gbl->clomut);
+	printer(user_t, "is sleeping\n", 0);
 	user_t->last_sleep = get_time();
 	usleep(user_t->gbl->tisle * 1000);
 }
 
 void	think(t_user *user_t)
 {
+	pthread_mutex_lock(&user_t->gbl->clomut);
 	if (*user_t->close == 0)
+	{
+		pthread_mutex_unlock(&user_t->gbl->clomut);
 		return ;
-	printer(user_t, "is thinking\n");
+	}
+	pthread_mutex_unlock(&user_t->gbl->clomut);
+	printer(user_t, "is thinking\n", 0);
 }
 
-void	eat(t_user *user_t)
+void	eat_odd(t_user *user_t)
+{
+	pthread_mutex_lock(&user_t->fork[user_t->right_f]);
+	printer(user_t, "has taken a fork right\n", 0);
+	pthread_mutex_lock(&user_t->fork[user_t->left_f]);
+	printer(user_t, "has taken a fork left\n", 0);
+	printer(user_t, "is eating\n", 0);
+	pthread_mutex_lock(&user_t->gbl->eatmut);
+	user_t->last_eat = get_time();
+	pthread_mutex_unlock(&user_t->gbl->eatmut);
+	pthread_mutex_lock(&user_t->gbl->nbrmut);
+	user_t->nbr_eat++;
+	pthread_mutex_unlock(&user_t->gbl->nbrmut);
+	usleep(user_t->gbl->tieat * 1000);
+	pthread_mutex_unlock(&user_t->fork[user_t->right_f]);
+	pthread_mutex_unlock(&user_t->fork[user_t->left_f]);
+}
+
+void	eat_even(t_user *user_t)
 {
 	pthread_mutex_lock(&user_t->fork[user_t->left_f]);
-	printer(user_t, "has taken a fork left\n");
+	printer(user_t, "has taken a fork left\n", 0);
 	pthread_mutex_lock(&user_t->fork[user_t->right_f]);
-	printer(user_t, "has taken a fork right\n");
-	pthread_mutex_lock(&user_t->eatmut);
-	user_t->eating = 1;
-	printer(user_t, "is eating\n");
+	printer(user_t, "has taken a fork right\n", 0);
+	printer(user_t, "is eating\n", 0);
+	pthread_mutex_lock(&user_t->gbl->eatmut);
 	user_t->last_eat = get_time();
+	pthread_mutex_unlock(&user_t->gbl->eatmut);
+	pthread_mutex_lock(&user_t->gbl->nbrmut);
 	user_t->nbr_eat++;
+	pthread_mutex_unlock(&user_t->gbl->nbrmut);
 	usleep(user_t->gbl->tieat * 1000);
-	user_t->eating = 0;
-	pthread_mutex_unlock(&user_t->eatmut);
 	pthread_mutex_unlock(&user_t->fork[user_t->left_f]);
 	pthread_mutex_unlock(&user_t->fork[user_t->right_f]);
 }
@@ -70,14 +79,21 @@ void	*routine(void *user)
 	t_user	*user_t;
 
 	user_t = (t_user *)user;
+	pthread_mutex_lock(&user_t->gbl->clomut);
 	while (*user_t->close == 1)
 	{
+		pthread_mutex_unlock(&user_t->gbl->clomut);
 		if (user_t->gbl->nuph == 1)
 			return (NULL);
-		eat(user_t);
+		if ((user_t->left_f % 2) == 1)
+			eat_even(user_t);
+		if ((user_t->left_f % 2) == 0)
+			eat_odd(user_t);
 		sleeping(user_t);
 		think(user_t);
 		usleep(100);
+		pthread_mutex_lock(&user_t->gbl->clomut);
 	}
+	pthread_mutex_unlock(&user_t->gbl->clomut);
 	return (NULL);
 }
