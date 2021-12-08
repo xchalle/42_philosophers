@@ -34,7 +34,7 @@ void	check_nbr(t_user *user_t)
 	pthread_mutex_lock(&user_t->gbl->nbrmut);
 	if (user_t->nbr_eat == user_t->gbl->nueat && user_t->only_once == 1)
 	{
-		pthread_mutex_unlock(&user_t->gbl->diemut);
+		pthread_mutex_lock(&user_t->gbl->diemut);
 		user_t->gbl->done_eat++;
 		user_t->only_once = 0;
 		pthread_mutex_unlock(&user_t->gbl->diemut);
